@@ -1883,6 +1883,15 @@ function interface_configure($interface = "wan", $reloadall = false) {
 
 	$realif = get_real_interface($interface);
 
+	/* Virtual PC/Server workaround */
+	if (preg_match("/^de[0-9]+$/", $realif)) {
+		exec("/sbin/ifconfig {$realif} up 2> /dev/null > /dev/null");
+		exec("/sbin/ifconfig {$realif} down 2> /dev/null > /dev/null");
+	}
+	if ($realhwif && $realhwif != $realif && preg_match("/^de[0-9]+$/", $realhwif)) {
+		exec("/sbin/ifconfig {$realhwif} up 2> /dev/null > /dev/null");
+		exec("/sbin/ifconfig {$realhwif} down 2> /dev/null > /dev/null");
+	} /* End of Virtual PC/Server workaround */
 	if (!$g['booting']) {
 		/* remove all IPv4 addresses */
 		while (mwexec("/sbin/ifconfig " . escapeshellarg($realif) . " -alias", true) == 0);
