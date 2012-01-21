@@ -1883,6 +1883,12 @@ function interface_configure($interface = "wan", $reloadall = false) {
 
 	$realif = get_real_interface($interface);
 
+	if (!$g['booting']) {
+		/* remove all IPv4 addresses */
+		while (mwexec("/sbin/ifconfig " . escapeshellarg($realif) . " -alias", true) == 0);
+			interface_bring_down($interface);
+	}
+
 	/* Virtual PC/Server workaround */
 	if (preg_match("/^de[0-9]+$/", $realif)) {
 		exec("/sbin/ifconfig {$realif} up 2> /dev/null > /dev/null");
@@ -1892,12 +1898,6 @@ function interface_configure($interface = "wan", $reloadall = false) {
 		exec("/sbin/ifconfig {$realhwif} up 2> /dev/null > /dev/null");
 		exec("/sbin/ifconfig {$realhwif} down 2> /dev/null > /dev/null");
 	} /* End of Virtual PC/Server workaround */
-	if (!$g['booting']) {
-		/* remove all IPv4 addresses */
-		while (mwexec("/sbin/ifconfig " . escapeshellarg($realif) . " -alias", true) == 0);
-			interface_bring_down($interface);
-	}
-
 	/* wireless configuration? */
 	if (is_array($wancfg['wireless']))
 		interface_wireless_configure($realif, $wancfg, $wancfg['wireless']);
