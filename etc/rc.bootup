@@ -196,9 +196,10 @@ system_hosts_generate();
 /* configure loopback interface */
 interfaces_loopback_configure();
 /* Virtual PC/Server workaround */
-foreach(array('de0', 'de1', 'de2', 'de3') as $vpc_if)
-        foreach(array('up', 'down') as $vpc_if_state)
-                exec("/sbin/ifconfig {$vpc_if} {$vpc_if_state} 2> /dev/null > /dev/null");
+foreach(array_keys(get_interface_list()) as $vpc_if)
+	if (preg_match("/^de[0-9]+$/", $vpc_if))
+		foreach(array('up', 'down') as $vpc_if_state)
+			exec("/sbin/ifconfig {$vpc_if} {$vpc_if_state} 2> /dev/null > /dev/null");
 
 /* set up interfaces */
 if(!$debugging)
